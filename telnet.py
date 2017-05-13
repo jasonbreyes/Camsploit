@@ -4,6 +4,7 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(('0.0.0.0',23))
 server.listen(5)
 print "[*] Listening on 0.0.0.0:23"
+print "[*] Press CTRL+C to exit out of this program"
 
 try:
 
@@ -16,8 +17,6 @@ try:
         while 1:
             response = client_socket.recv(4096)
             print response
-            if response == "exit":
-                server.close()
 except KeyboardInterrupt:
     server.close()
     print "Bye!"

